@@ -7,39 +7,39 @@ gcloud config set project <YOUR_PROJECT_ID>
 gcloud services enable run.googleapis.com artifactregistry.googleapis.com cloudbuild.googleapis.com
 
 Step 1 - Variables
-set PROJECT_ID=<YOUR_PROJECT_ID>
-set REGION=<YOUR_REGION>
-set SERVICE_NAME=digiwa-backend
-set IMAGE=gcr.io/%PROJECT_ID%/%SERVICE_NAME%
+export PROJECT_ID=<YOUR_PROJECT_ID>
+export REGION=<YOUR_REGION>
+export SERVICE_NAME=digiwa-backend
+export IMAGE=gcr.io/$PROJECT_ID/$SERVICE_NAME
 
 Step 2 - Build & Push Images
-gcloud builds submit --tag %IMAGE%
+gcloud builds submit --tag $IMAGE
 
 Step 3 - Deploy to Cloud Run
-gcloud run deploy %SERVICE_NAME% ^
-  --image %IMAGE% ^
-  --platform managed ^
-  --region %REGION% ^
-  --cpu 1 ^
-  --memory 2Gi ^
-  --min-instances 0 ^
-  --max-instances 1 ^
-  --port 8080 ^
-  --timeout 60 ^
-  --set-env-vars "FLASK_DEBUG=false" ^
-  --set-env-vars "APP_SECRET=<YOUR_APP_SECRET>" ^
-  --set-env-vars "TOKEN_MAX_AGE_SECONDS=604800" ^
-  --set-env-vars "DB_BACKEND=supabase" ^
-  --set-env-vars "SUPABASE_URL=<YOUR_SUPABASE_URL>" ^
-  --set-env-vars "SUPABASE_SERVICE_ROLE_KEY=<YOUR_SUPABASE_SERVICE_ROLE_KEY>" ^
-  --set-env-vars "CLOUDINARY_CLOUD_NAME=<YOUR_CLOUDINARY_CLOUD_NAME>" ^
-  --set-env-vars "CLOUDINARY_API_KEY=<YOUR_CLOUDINARY_API_KEY>" ^
-  --set-env-vars "CLOUDINARY_API_SECRET=<YOUR_CLOUDINARY_API_SECRET>" ^
-  --set-env-vars "CLOUDINARY_UPLOAD_FOLDER=digiwa" ^
+gcloud run deploy $SERVICE_NAME \
+  --image $IMAGE \
+  --platform managed \
+  --region $REGION \
+  --cpu 1 \
+  --memory 2Gi \
+  --min-instances 0 \
+  --max-instances 1 \
+  --port 8080 \
+  --timeout 60 \
+  --set-env-vars "FLASK_DEBUG=false" \
+  --set-env-vars "APP_SECRET=<YOUR_APP_SECRET>" \
+  --set-env-vars "TOKEN_MAX_AGE_SECONDS=604800" \
+  --set-env-vars "DB_BACKEND=supabase" \
+  --set-env-vars "SUPABASE_URL=<YOUR_SUPABASE_URL>" \
+  --set-env-vars "SUPABASE_SERVICE_ROLE_KEY=<YOUR_SUPABASE_SERVICE_ROLE_KEY>" \
+  --set-env-vars "CLOUDINARY_CLOUD_NAME=<YOUR_CLOUDINARY_CLOUD_NAME>" \
+  --set-env-vars "CLOUDINARY_API_KEY=<YOUR_CLOUDINARY_API_KEY>" \
+  --set-env-vars "CLOUDINARY_API_SECRET=<YOUR_CLOUDINARY_API_SECRET>" \
+  --set-env-vars "CLOUDINARY_UPLOAD_FOLDER=digiwa" \
   --allow-unauthenticated
 
 Step 4 - Verify
-gcloud run services describe %SERVICE_NAME% --region %REGION%
+gcloud run services describe $SERVICE_NAME --region $REGION
 gcloud run services list --platform managed
 
 Notes
