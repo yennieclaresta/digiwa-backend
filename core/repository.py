@@ -220,9 +220,10 @@ class SupabaseRepository(Repository):
             "phone_number": payload["phone"],
             "password_hash": generate_password_hash(payload["password"]),
         }
-        created_user = self._first(self.client.table("users").insert(user_insert).execute())
+        # .select() is required in supabase-py v2.x to get the inserted row back
+        created_user = self._first(self.client.table("users").insert(user_insert).select().execute())
         if not created_user:
-            raise RuntimeError("Failed to create user.")
+            raise RuntimeError("Failed to create user in database.")
         profile_insert = {
             "user_id": created_user["id"],
             "nik": payload["nik"] or None,
@@ -231,7 +232,7 @@ class SupabaseRepository(Repository):
             "rt": payload["rt"],
             "rw": payload["rw"],
         }
-        self.client.table("warga_profiles").insert(profile_insert).execute()
+        self.client.table("warga_profiles").insert(profile_insert).select().execute()
         return self.fetch_user(created_user["id"])
 
     def update_user_profile(self, user_id: str, payload: dict[str, Any]) -> dict[str, Any]:

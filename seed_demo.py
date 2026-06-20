@@ -45,6 +45,7 @@ def seed_supabase():
                 "password_hash": generate_password_hash("admin123"),
             }
         )
+        .select()
         .execute()
         .data
         or []
