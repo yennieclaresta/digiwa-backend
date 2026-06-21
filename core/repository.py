@@ -347,7 +347,7 @@ class SupabaseRepository(Repository):
             raise ValueError("not_done")
         file_name = file_name_override or f'{request_row["tracking_number"]}.pdf'
         cloud_name = self.config.get("CLOUDINARY_CLOUD_NAME", "")
-        public_url = f'https://res.cloudinary.com/{cloud_name}/image/upload/{public_id}' if public_id and cloud_name else ""
+        public_url = f'https://res.cloudinary.com/{cloud_name}/raw/upload/{public_id}' if public_id and cloud_name else ""
         generated: dict[str, Any] = {
             "request_id": request_id,
             "generated_by": admin_id,
@@ -609,7 +609,7 @@ class PostgresRepository(Repository):
             raise ValueError("not_done")
         file_name = file_name_override or f'{request_row["tracking_number"]}.pdf'
         cloud_name = self.config.get("CLOUDINARY_CLOUD_NAME", "")
-        public_url = f'https://res.cloudinary.com/{cloud_name}/image/upload/{public_id}' if public_id and cloud_name else ""
+        public_url = f'https://res.cloudinary.com/{cloud_name}/raw/upload/{public_id}' if public_id and cloud_name else ""
         generated: dict[str, Any] = {
             "request_id": request_id,
             "generated_by": admin_id,
