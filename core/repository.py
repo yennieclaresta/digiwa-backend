@@ -220,8 +220,7 @@ class SupabaseRepository(Repository):
             "phone_number": payload["phone"],
             "password_hash": generate_password_hash(payload["password"]),
         }
-        # .select() is required in supabase-py v2.x to get the inserted row back
-        created_user = self._first(self.client.table("users").insert(user_insert).select().execute())
+        created_user = self._first(self.client.table("users").insert(user_insert).execute())
         if not created_user:
             raise RuntimeError("Failed to create user in database.")
         profile_insert = {
@@ -232,7 +231,7 @@ class SupabaseRepository(Repository):
             "rt": payload["rt"],
             "rw": payload["rw"],
         }
-        profile_result = self._first(self.client.table("warga_profiles").insert(profile_insert).select().execute())
+        profile_result = self._first(self.client.table("warga_profiles").insert(profile_insert).execute())
         if not profile_result:
             raise RuntimeError("Failed to create warga profile in database.")
         return self.fetch_user(created_user["id"])
@@ -300,7 +299,7 @@ class SupabaseRepository(Repository):
             "applicant_nik": applicant_nik or None,
             "metadata": form_data,
         }
-        created = self._first(self.client.table("service_requests").insert(request_insert).select().execute())
+        created = self._first(self.client.table("service_requests").insert(request_insert).execute())
         if not created:
             raise RuntimeError("Failed to create request.")
         detail_table, detail_payload = build_detail_payload(

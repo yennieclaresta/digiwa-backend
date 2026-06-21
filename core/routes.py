@@ -135,9 +135,9 @@ def register():
         if user_payload["nik"] and repo.nik_exists(user_payload["nik"]):
             return error("Email atau NIK sudah terdaftar.", 409)
         user_row = repo.create_user(user_payload)
-    except Exception as exc:
-        current_app.logger.error("register failed: %s", exc)
-        return error(f"Gagal menyimpan data: {exc}", 500)
+    except Exception:
+        current_app.logger.exception("register failed email=%s", user_payload["email"])
+        return error("Gagal menyimpan data.", 500)
     user = repo.serialize_user(user_row)
     return jsonify({"token": issue_token(user["id"], ROLE_WARGA), "user": user}), 201
 
