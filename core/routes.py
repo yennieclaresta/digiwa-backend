@@ -128,17 +128,16 @@ def register():
     if len(user_payload["password"]) < 6:
         return error("Password minimal 6 karakter.", 400)
 
-    repo = get_repository()
-    if repo.email_exists(user_payload["email"]):
-        return error("Email sudah terdaftar.", 409)
-    if user_payload["nik"] and repo.nik_exists(user_payload["nik"]):
-        return error("Email atau NIK sudah terdaftar.", 409)
-
     try:
+        repo = get_repository()
+        if repo.email_exists(user_payload["email"]):
+            return error("Email sudah terdaftar.", 409)
+        if user_payload["nik"] and repo.nik_exists(user_payload["nik"]):
+            return error("Email atau NIK sudah terdaftar.", 409)
         user_row = repo.create_user(user_payload)
     except Exception as exc:
-        current_app.logger.error("register create_user failed: %s", exc)
-        return error("Gagal menyimpan data. Silakan coba lagi.", 500)
+        current_app.logger.error("register failed: %s", exc)
+        return error(f"Gagal menyimpan data: {exc}", 500)
     user = repo.serialize_user(user_row)
     return jsonify({"token": issue_token(user["id"], ROLE_WARGA), "user": user}), 201
 
@@ -219,16 +218,24 @@ def create_request():
         return error("Data belum lengkap.", 400)
     if applicant_nik and not is_valid_nik(applicant_nik):
         return error("Format NIK tidak valid.", 400)
-
-    created = get_repository().create_request(
-        user_id=g.user["id"],
-        service_type=service_type,
-        applicant_name=applicant_name,
-        applicant_nik=applicant_nik,
-        form_data=form_data,
-        uploaded_files=uploaded_files,
-        statement_accepted=statement_accepted,
-    )
+    try:
+        created = get_repository().create_request(
+            user_id=g.user["id"],
+            service_type=service_type,
+            applicant_name=applicant_name,
+            applicant_nik=applicant_nik,
+            form_data=form_data,
+            uploaded_files=uploaded_files,
+            statement_accepted=statement_accepted,
+        )
+    except Exception:
+        current_app.logger.exception(
+            "create_request failed user_id=%s service_type=%s uploaded_files=%s",
+            g.user["id"],
+            service_type,
+            len(uploaded_files) if isinstance(uploaded_files, list) else "invalid",
+        )
+        return error("Gagal menyimpan pengajuan.", 500)
     return jsonify({"request": normalize_request(created)}), 201
 
 @api.route("/requests/<request_id>", methods=["GET"])

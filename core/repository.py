@@ -300,7 +300,7 @@ class SupabaseRepository(Repository):
             "applicant_nik": applicant_nik or None,
             "metadata": form_data,
         }
-        created = self._first(self.client.table("service_requests").insert(request_insert).execute())
+        created = self._first(self.client.table("service_requests").insert(request_insert).select().execute())
         if not created:
             raise RuntimeError("Failed to create request.")
         detail_table, detail_payload = build_detail_payload(
