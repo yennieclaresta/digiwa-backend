@@ -17,6 +17,12 @@ from .domain import (
     to_plain_data,
 )
 
+def cloudinary_public_file_url(cloud_name: str, public_id: str | None, default_ext: str = "pdf") -> str:
+    if not cloud_name or not public_id:
+        return ""
+    asset_path = public_id if "." in public_id.rsplit("/", 1)[-1] else f"{public_id}.{default_ext}"
+    return f"https://res.cloudinary.com/{cloud_name}/raw/upload/{asset_path}"
+
 def get_repository():
     repo = current_app.extensions.get("repository")
     if repo:
@@ -347,7 +353,7 @@ class SupabaseRepository(Repository):
             raise ValueError("not_done")
         file_name = file_name_override or f'{request_row["tracking_number"]}.pdf'
         cloud_name = self.config.get("CLOUDINARY_CLOUD_NAME", "")
-        public_url = f'https://res.cloudinary.com/{cloud_name}/raw/upload/{public_id}' if public_id and cloud_name else ""
+        public_url = cloudinary_public_file_url(cloud_name, public_id)
         generated: dict[str, Any] = {
             "request_id": request_id,
             "generated_by": admin_id,
@@ -609,7 +615,7 @@ class PostgresRepository(Repository):
             raise ValueError("not_done")
         file_name = file_name_override or f'{request_row["tracking_number"]}.pdf'
         cloud_name = self.config.get("CLOUDINARY_CLOUD_NAME", "")
-        public_url = f'https://res.cloudinary.com/{cloud_name}/raw/upload/{public_id}' if public_id and cloud_name else ""
+        public_url = cloudinary_public_file_url(cloud_name, public_id)
         generated: dict[str, Any] = {
             "request_id": request_id,
             "generated_by": admin_id,
