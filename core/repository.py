@@ -232,7 +232,9 @@ class SupabaseRepository(Repository):
             "rt": payload["rt"],
             "rw": payload["rw"],
         }
-        self.client.table("warga_profiles").insert(profile_insert).select().execute()
+        profile_result = self._first(self.client.table("warga_profiles").insert(profile_insert).select().execute())
+        if not profile_result:
+            raise RuntimeError("Failed to create warga profile in database.")
         return self.fetch_user(created_user["id"])
 
     def update_user_profile(self, user_id: str, payload: dict[str, Any]) -> dict[str, Any]:
