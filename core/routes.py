@@ -26,6 +26,9 @@ def document_download_url(document_id: str) -> str:
 def normalize_document(document: dict[str, object]) -> dict[str, object]:
     normalized = dict(document)
     document_id = str(normalized.get("id") or "")
+    public_url = str(normalized.get("public_url") or "")
+    if "res.cloudinary.com" in public_url and "/raw/upload/" in public_url:
+        normalized["public_url"] = public_url.replace("/raw/upload/", "/image/upload/")
     if document_id:
         normalized["download_url"] = document_download_url(document_id)
         normalized["public_url"] = normalized.get("public_url") or normalized["download_url"]
