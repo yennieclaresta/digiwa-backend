@@ -21,7 +21,7 @@ def cloudinary_public_file_url(cloud_name: str, public_id: str | None, default_e
     if not cloud_name or not public_id:
         return ""
     asset_path = public_id if "." in public_id.rsplit("/", 1)[-1] else f"{public_id}.{default_ext}"
-    return f"https://res.cloudinary.com/{cloud_name}/raw/upload/{asset_path}"
+    return f"https://res.cloudinary.com/{cloud_name}/image/upload/{asset_path}"
 
 def get_repository():
     repo = current_app.extensions.get("repository")
